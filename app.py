@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from PIL import Image
-from io import BytesIO
+from fastapi.responses import Response
+from rembg import remove
 
 app = FastAPI(
     title="BGErase API",
@@ -49,16 +49,17 @@ async def remove_background(file: UploadFile = File(...)):
         )
 
     try:
-        image = Image.open(BytesIO(data))
-        image.verify()
-    except Exception:
+        result = remove(data)
+    except Exception as e:
         raise HTTPException(
-            status_code=400,
-            detail="Invalid image file."
+            status_code=500,
+            detail=f"Background removal failed: {str(e)}"
         )
 
-    return {
-        "status": "success",
-        "message": "Image received successfully.",
-        "filename": file.filename
-    }
+    return Response(
+        content=result,
+        media_type="image/png",
+        headers={
+            "Content-Disposition": "attachment; filename=bgerase-result.png"
+        }
+                )
