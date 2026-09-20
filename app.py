@@ -1,5 +1,4 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import Response
 from PIL import Image
 from io import BytesIO
 
@@ -21,7 +20,9 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy"
+    }
 
 
 @app.post("/remove-background")
@@ -60,4 +61,4 @@ async def remove_background(file: UploadFile = File(...)):
         "status": "success",
         "message": "Image received successfully.",
         "filename": file.filename
-  }
+    }
